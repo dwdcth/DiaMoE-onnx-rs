@@ -1,0 +1,32 @@
+[package]
+name = "diamoe-rust"
+version = "0.1.0"
+edition = "2021"
+description = "DiaMoE-TTS 的 Rust 推理：ONNX Runtime 跑 DiT 流匹配 + Vocos，Euler ODE/CFG 在 Rust 侧"
+
+[[bin]]
+name = "diamoe-tts"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+hound = "3"
+rand = "0.8"
+rand_distr = "0.4"
+rustfft = "6"
+# ort: ONNX Runtime 的 Rust 绑定。默认构建会下载官方 ORT 二进制（CPU 版）。
+# 启用 cuda feature 后可在 NVIDIA GPU 上跑（需 ORT 的 CUDA provider 随包提供）：
+#   cargo build --release --features cuda
+ort = { version = "=2.0.0-rc.10", features = ["download-binaries", "ndarray"] }
+# 文本前端：jieba 分词（含词性标注）、HF 官方 WordPiece tokenizer、g2pw 数据 JSON
+jieba-rs = "0.10"
+tokenizers = { version = "0.21", default-features = false, features = ["onig"] }
+serde_json = "1"
+
+[features]
+default = []
+cuda = ["ort/cuda"]
+
+[profile.release]
+opt-level = 3
