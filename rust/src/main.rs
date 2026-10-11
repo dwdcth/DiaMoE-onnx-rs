@@ -1,13 +1,13 @@
 //! diamoe-tts: DiaMoE-TTS 的 Rust 推理程序。
 //!
 //! 管线（与官方 CFM.sample / infer 语义对齐，图划分见 export/export_models.py）：
+//!   文本（--text-hanzi 汉字走内置前端，或 --text IPA）→ token 化
 //!   参考 wav --(preprocess.onnx)--> log mel 条件
-//!   文本 --(vocab 最长匹配 token 化)--> token ids
 //!   Euler ODE 循环（Rust 侧）：每步两次调用 dit_step.onnx 做 CFG，sway 时间步
 //!   生成 mel --(vocos_spec.onnx)--> 复数频谱 --(Rust 侧 ISTFT)--> wav
 //!
-//! 注意：输入文本应是经官方 IPA 前端处理过的 token 串（如 prompts/*.txt 的第三列），
-//! 普通汉字文本需先走官方 dialect_frontend 转 IPA，见 README。
+//! 伪影缓解（详见 README）：参考首尾静音修剪+尾垫、响度双向归一化、
+//! 长文本按句读分块+交叉淡入淡出、输出 VAD 裁剪、--best-of N mel medoid 择优。
 
 mod frontend;
 
